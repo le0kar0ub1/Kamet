@@ -1,5 +1,5 @@
 [package]
-name = "tetris"
+name = "kamet"
 version = "0.1.0"
 authors = ["leo.karoubi <leokaroubi@gmail.com>"]
 edition = "2018"
@@ -20,7 +20,6 @@ linked_list_allocator = "0.8.0"
 version = "1.0"
 features = ["spin_no_std"]
 
-
 [package.metadata.bootimage]
 test-args = [
     "-device", "isa-debug-exit,iobase=0xf4,iosize=0x04", "-serial", "stdio",
@@ -28,10 +27,8 @@ test-args = [
 ]
 test-success-exit-code = 33         # (0x10 << 1) | 1
 
-# the profile used for `cargo build`
 [profile.dev]
-panic = "abort" # disable stack unwinding on panic
+panic = "abort"
 
-# the profile used for `cargo build --release`
 [profile.release]
-panic = "abort" # disable stack unwinding on panic
+panic = "abort"

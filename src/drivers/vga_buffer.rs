@@ -12,16 +12,19 @@ lazy_static! {
         VgaWriter {
             posx: 0,
             posy: BUFFER_HEIGHT - 1,
-            color_code: VgaColor::new(Color::Yellow, Color::Black),
-            buffer: unsafe { &mut *(BUFFER_ADDR as *mut Buffer) },
+            color_code: VgaColor::generate(VGAColors::White, VGAColors::Black),
+            buffer: unsafe { 
+                &mut *(BUFFER_ADDR as *mut Buffer)
+            },
         }
     );
 }
 
+#[warn(non_camel_case_types)]
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
-pub enum Color {
+pub enum VGAColors {
     Black = 0,
     Blue = 1,
     Green = 2,
@@ -40,19 +43,16 @@ pub enum Color {
     White = 15,
 }
 
-/// A combination of a foreground and a background color.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(transparent)]
 struct VgaColor(u8);
 
 impl VgaColor {
-    /// Create a new `VgaColor` with the given foreground and background colors.
-    fn new(foreground: Color, background: Color) -> VgaColor {
+    fn generate(foreground: VGAColors, background: VGAColors) -> VgaColor {
         VgaColor((background as u8) << 4 | (foreground as u8))
     }
 }
 
-/// A screen character in the VGA text buffer, consisting of an ASCII character and a `VgaColor`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(C)]
 struct VgaPx {
@@ -65,6 +65,7 @@ struct Buffer {
     pxls: [[Volatile<VgaPx>; BUFFER_WIDTH]; BUFFER_HEIGHT],
 }
 
+#[allow(dead_code)]
 pub struct VgaWriter {
     posx: usize,
     posy: usize,
@@ -75,13 +76,16 @@ pub struct VgaWriter {
 impl VgaWriter {
     pub fn write_byte(&mut self, byte: u8) {
         match byte {
-            b'\n' => self.new_line(),
+            b'\n' => self.scroll(),
             b'\t' => {
-                
-            }
-            byte => {
+                self.posx = (self.posx + (8 as usize)) & !(7 as usize);
+            },
+            b'\r' => {
+                self.posx = 0x0;
+            },
+            0x20..=0x7E => {
                 if self.posx >= BUFFER_WIDTH {
-                    self.new_line();
+                    self.scroll();
                 }
                 let color_code = self.color_code;
                 self.buffer.pxls[BUFFER_HEIGHT - 1][self.posx].write(
@@ -91,20 +95,20 @@ impl VgaWriter {
                     }
                 );
                 self.posx += 1;
-            }
+            },
+            _ => {}
         }
     }
 
     fn write_string(&mut self, s: &str) {
         for byte in s.bytes() {
-            match byte {
-                0x0..=0x7e => self.write_byte(byte),
-                _ => (),
+            if byte <= 0x7E {
+                self.write_byte(byte);
             }
         }
     }
 
-    fn new_line(&mut self) {
+    fn scroll(&mut self) {
         for row in 1..BUFFER_HEIGHT {
             for col in 0..BUFFER_WIDTH {
                 let character = self.buffer.pxls[row][col].read();

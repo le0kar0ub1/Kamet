@@ -4,7 +4,8 @@
 
 use core::panic::PanicInfo;
 
-mod vga_buffer;
+mod drivers;
+use drivers::vga_buffer;
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {

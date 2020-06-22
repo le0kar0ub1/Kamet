@@ -1,11 +1,11 @@
+#![feature(abi_x86_interrupt)]
 #![no_std]
 #![no_main]
-#![feature(asm)]
 
 use core::panic::PanicInfo;
 
 mod drivers;
-use drivers::vga_buffer;
+use drivers::vga;
 
 mod descriptors;
 

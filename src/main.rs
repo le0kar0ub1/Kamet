@@ -4,6 +4,9 @@
 
 use core::panic::PanicInfo;
 
+use x86_64;
+use bootloader;
+
 mod drivers;
 use drivers::vga;
 
@@ -12,12 +15,15 @@ mod descriptors;
 pub fn init() {
     descriptors::gdt::init();
     descriptors::idt::init();
+    // x86_64::
+
     // unsafe { interrupts::PICS.lock().initialize() };
     // x86_64::instructions::interrupts::enable();
 }
 
-#[no_mangle]
-pub extern "C" fn _start() -> ! {
+bootloader::entry_point!(_start);
+
+fn _start(_boot_info: &'static bootloader::BootInfo) -> ! {
     init();
     println!("All comes good");
     loop {}

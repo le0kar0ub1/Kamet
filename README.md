@@ -12,6 +12,4 @@ All the games are running with `VGA`. All the project is in `rust`.
 
 # Epilogue
 
-To learn rust language.
-
 Feel free to fork, use, improve.

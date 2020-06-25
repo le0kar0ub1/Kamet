@@ -1,3 +1,2 @@
-pub mod boot;
+pub mod kernel;
 pub mod drivers;
-pub mod interrupts;

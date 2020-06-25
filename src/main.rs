@@ -10,11 +10,11 @@ use bootloader;
 mod drivers;
 use drivers::vga;
 
-mod descriptors;
+mod kernel;
 
 pub fn init() {
-    descriptors::gdt::init();
-    descriptors::idt::init();
+    kernel::gdt::init();
+    kernel::idt::init();
     // x86_64::
 
     // unsafe { interrupts::PICS.lock().initialize() };

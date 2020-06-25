@@ -1,3 +1,6 @@
+use x86_64::structures::idt::{InterruptStackFrame, PageFaultErrorCode};
+use x86_64;
+
 static EXCEPTIONS: &[&str] = &[
     "Division By Zero",
     "Debug",
@@ -23,13 +26,22 @@ static EXCEPTIONS: &[&str] = &[
 ];
 static DEFAULT: &str = "Unhandled interrupt";
 
-pub fn exception_handler(int: usize) {
-    println!("{}", EXCEPTIONS.get(int).unwrap_or(&DEFAULT));
-    hlt();
+pub extern "x86-interrupt" fn exception_handler_noerror(stack_frame: &mut InterruptStackFrame) {
+    // println!("kernel panic: {}.", EXCEPTIONS.get(int).unwrap_or(&DEFAULT));
+    // hlt();
 }
 
-extern "x86-interrupt" fn double_fault_handler(
-    stack_frame: &mut InterruptStackFrame, _error_code: u64,)
--> ! {
-    panic!("EXCEPTION: DOUBLE FAULT\n{:#?}", stack_frame);
+pub extern "x86-interrupt" fn exception_handler_error(stack_frame: &mut InterruptStackFrame, _error: u64) {
+    // println!("kernel panic: {}.", EXCEPTIONS.get(int).unwrap_or(&DEFAULT));
+    // hlt();
+}
+
+pub extern "x86-interrupt" fn page_fault_handler(stack_frame: &mut InterruptStackFrame, pferr: PageFaultErrorCode) {
+
+}
+
+pub extern "x86-interrupt" fn double_fault_handler(stack_frame: &mut InterruptStackFrame, _err: u64) -> ! {
+    loop {
+        x86_64::instructions::hlt();
+    }
 }

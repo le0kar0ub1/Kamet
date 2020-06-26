@@ -2,6 +2,7 @@ use lazy_static::lazy_static;
 use x86_64::structures::idt::InterruptDescriptorTable;
 
 use crate::kernel::exceptions;
+use crate::kernel::pic;
 
 lazy_static! {
     static ref IDT: InterruptDescriptorTable = {
@@ -25,6 +26,8 @@ lazy_static! {
         idt.simd_floating_point.set_handler_fn(exceptions::simd_floating_point_handler);
         idt.virtualization.set_handler_fn(exceptions::virtualization_handler);
         idt.security_exception.set_handler_fn(exceptions::security_exception_handler);
+        idt[32].set_handler_fn(pic::timer_handler);
+        // idt[33].set_handler_fn(pic::keyboard_handler);
         idt
     };
 }

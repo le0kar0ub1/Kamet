@@ -82,8 +82,12 @@ pub extern "x86-interrupt" fn general_protection_fault_handler(stackframe: &mut 
     println!("Exception taken: general_protection_fault\n{:?}", stackframe);
     loop { x86_64::instructions::hlt() };
 }
-pub extern "x86-interrupt" fn page_fault_handler(stackframe: &mut InterruptStackFrame, _err: PageFaultErrorCode) {
+pub extern "x86-interrupt" fn page_fault_handler(stackframe: &mut InterruptStackFrame, err: PageFaultErrorCode) {
+    use x86_64::registers::control::Cr2;
     println!("Exception taken: page_fault\n{:?}", stackframe);
+    println!("Error Code: {:?}", err);
+    println!("Accessed Address: {:?}", Cr2::read());
+    println!("{:#?}", stackframe);
     loop { x86_64::instructions::hlt() };
 }
 pub extern "x86-interrupt" fn x87_floating_point_handler(stackframe: &mut InterruptStackFrame) {

@@ -27,7 +27,7 @@ lazy_static! {
         idt.virtualization.set_handler_fn(exceptions::virtualization_handler);
         idt.security_exception.set_handler_fn(exceptions::security_exception_handler);
         idt[32].set_handler_fn(pic::timer_handler);
-        // idt[33].set_handler_fn(pic::keyboard_handler);
+        idt[33].set_handler_fn(pic::keyboard_handler);
         idt
     };
 }

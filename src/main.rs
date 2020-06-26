@@ -15,10 +15,8 @@ mod kernel;
 pub fn init() {
     kernel::gdt::init();
     kernel::idt::init();
-    // x86_64::
-
-    // unsafe { interrupts::PICS.lock().initialize() };
-    // x86_64::instructions::interrupts::enable();
+    unsafe { kernel::pic::PICS.lock().initialize() };
+    x86_64::instructions::interrupts::enable();
 }
 
 bootloader::entry_point!(_start);

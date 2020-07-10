@@ -10,13 +10,18 @@ use bootloader;
 mod drivers;
 use drivers::vga;
 
+mod kamet;
+
 mod kernel;
 
 pub fn init() {
     kernel::gdt::init();
     kernel::idt::init();
-    unsafe { kernel::pic::PICS.lock().initialize() };
+    unsafe { 
+        kernel::pic::PICS.lock().initialize()
+    };
     x86_64::instructions::interrupts::enable();
+    kamet::strt::menu();
 }
 
 bootloader::entry_point!(_start);

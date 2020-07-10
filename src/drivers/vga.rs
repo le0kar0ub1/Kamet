@@ -1,11 +1,13 @@
+#![allow(dead_code)]
+
 use core::fmt;
 use lazy_static::lazy_static;
 use spin::Mutex;
 use volatile::Volatile;
 
-const BUFFER_ADDR:   usize = 0xb8000;
-const BUFFER_HEIGHT: usize = 25;
-const BUFFER_WIDTH:  usize = 80;
+const BUFFER_ADDR:       usize = 0xb8000;
+pub const BUFFER_HEIGHT: usize = 25;
+pub const BUFFER_WIDTH:  usize = 80;
 
 lazy_static! {
     pub static ref WRITER: Mutex<VgaWriter> = Mutex::new(
@@ -76,7 +78,10 @@ pub struct VgaWriter {
 impl VgaWriter {
     pub fn write_byte(&mut self, byte: u8) {
         match byte {
-            b'\n' => self.scroll(),
+                b'\n' => match self.posy {
+                0..=BUFFER_HEIGHT => self.posy += 1,
+                _ => self.posy = 0, 
+            },
             b'\t' => {
                 self.posx = (self.posx + (8 as usize)) & !(7 as usize);
             },
@@ -85,10 +90,11 @@ impl VgaWriter {
             },
             0x20..=0x7E => {
                 if self.posx >= BUFFER_WIDTH {
-                    self.scroll();
+                    self.posx = 0x0;
+                    self.posy += 0x1;
                 }
                 let color_code = self.color_code;
-                self.buffer.pxls[BUFFER_HEIGHT - 1][self.posx].write(
+                self.buffer.pxls[self.posy][self.posx].write(
                     VgaPx {
                         ascii_character: byte,
                         color_code,
@@ -127,6 +133,29 @@ impl VgaWriter {
         for col in 0..BUFFER_WIDTH {
             self.buffer.pxls[row][col].write(blank);
         }
+    }
+
+    pub fn set_cursor(&mut self, x: usize, y: usize) {
+        self.posx = x;
+        self.posy = y;
+    }
+
+    pub fn getx(&self) -> usize {
+        self.posx
+    }
+
+    pub fn gety(&self) -> usize {
+        self.posy
+    }
+
+    pub fn fclear(&mut self) {
+        for i in 0..BUFFER_HEIGHT {
+            self.clear_row(i);
+        }
+    }
+
+    pub fn set_color(&mut self, front: VGAColors, back: VGAColors) {
+        self.color_code = VgaColor::generate(front, back);
     }
 }
 

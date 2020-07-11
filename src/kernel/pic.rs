@@ -4,8 +4,15 @@ use lazy_static::lazy_static;
 use spin;
 use x86_64::structures::idt::InterruptStackFrame;
 
+const INTERRUPT_INDEX_PIC1: u8 = 32;
+const INTERRUPT_INDEX_PIC2: u8 = 40;
+
 pub static PICS: spin::Mutex<ChainedPics> =
-    spin::Mutex::new(unsafe { ChainedPics::new(32, 40) });
+    spin::Mutex::new(unsafe { ChainedPics::new(INTERRUPT_INDEX_PIC1, INTERRUPT_INDEX_PIC2) });
+
+pub fn irq_index(base: u8) -> u8 {
+    base + 32
+}
 
 pub extern "x86-interrupt" fn timer_handler(_stackframe: &mut InterruptStackFrame) {
     unsafe {

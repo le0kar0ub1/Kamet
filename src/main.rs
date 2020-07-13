@@ -17,6 +17,8 @@ mod kernel;
 pub fn init() {
     kernel::gdt::init();
     kernel::idt::init();
+    drivers::keyboard::init();
+    drivers::serial::init();
     unsafe { 
         kernel::pic::PICS.lock().initialize()
     };

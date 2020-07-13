@@ -62,8 +62,6 @@ lazy_static! {
         idt.simd_floating_point.set_handler_fn(exceptions::simd_floating_point_handler);
         idt.virtualization.set_handler_fn(exceptions::virtualization_handler);
         idt.security_exception.set_handler_fn(exceptions::security_exception_handler);
-        idt[32].set_handler_fn(pic::timer_handler);
-        idt[33].set_handler_fn(pic::keyboard_handler);
 
         idt[pic::irq_index(0) as usize].set_handler_fn(irq0_handler);
         idt[pic::irq_index(1) as usize].set_handler_fn(irq1_handler);

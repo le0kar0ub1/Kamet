@@ -79,8 +79,14 @@ impl VgaWriter {
     pub fn write_byte(&mut self, byte: u8) {
         match byte {
                 b'\n' => match self.posy {
-                0..=BUFFER_HEIGHT => self.posy += 1,
-                _ => self.posy = 0, 
+                0..=BUFFER_HEIGHT => {
+                    self.posx = 0;
+                    self.posy += 1
+                },
+                _ => {
+                    self.posx = 0;
+                    self.posy = 0
+                }, 
             },
             b'\t' => {
                 self.posx = (self.posx + (8 as usize)) & !(7 as usize);

@@ -1,6 +1,7 @@
 use lazy_static::lazy_static;
 use spin::Mutex;
 use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
+use x86_64::instructions::interrupts;
 
 use crate::kernel::exceptions;
 use crate::kernel::pic;
@@ -84,8 +85,14 @@ lazy_static! {
     };
 }
 
+pub fn register_irq_handler(irq: u8, handler: fn()) {
+    interrupts::without_interrupts(|| {
+        let mut handlers = IRQ_HANDLERS.lock();
+        handlers[irq as usize] = handler;
+        pic::clear_irq_mask(irq);
+    });
+}
+
 pub fn init() {
     IDT.load();
 }
-
-// type X86handler = extern "x86-interrupt" fn(stack_frame: &mut InterruptStackFrame);

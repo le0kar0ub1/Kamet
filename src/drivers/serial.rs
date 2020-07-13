@@ -1,42 +1,61 @@
+use crate::kernel;
 use lazy_static::lazy_static;
 use spin::Mutex;
 use uart_16550::SerialPort;
-
-const COM1: u16 = 0x3F8;
+use core::fmt;
+use core::fmt::Write;
 
 lazy_static! {
-    pub static ref SERIALCOM1: Mutex<SerialPort> = {
-        let mut serial_port = unsafe {
-            SerialPort::new(COM1)
+    pub static ref SERIAL: Mutex<Serial> = Mutex::new(Serial::new(0x3F8));
+}
+
+pub struct Serial {
+    pub port: SerialPort
+}
+
+impl Serial {
+    fn new(addr: u16) -> Self {
+        let mut port = unsafe { 
+            SerialPort::new(addr)
         };
-        serial_port.init();
-        Mutex::new(serial_port)
-    };
+        port.init();
+        Self { 
+            port
+        }
+    }
+
+    fn write_string(&mut self, s: &str) {
+        for byte in s.bytes() {
+            self.write_byte(byte)
+        }
+    }
+
+    pub fn write_byte(&mut self, byte: u8) {
+        self.port.send(byte);
+    }
+}
+
+impl fmt::Write for Serial {
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        self.write_string(s);
+        Ok(())
+    }
 }
 
 #[doc(hidden)]
-pub fn _print(args: ::core::fmt::Arguments) {
-    use core::fmt::Write;
-    use x86_64::instructions::interrupts;
-    interrupts::without_interrupts(|| {
-        SERIALCOM1
-            .lock()
-            .write_fmt(args)
-            .expect("Printing to serial failed");
-    });
+pub fn print_fmt(args: fmt::Arguments) {
+    SERIAL.lock().write_fmt(args).expect("Could not print to serial");
 }
 
-#[macro_export]
-macro_rules! serial_print {
-    ($($arg:tt)*) => {
-        $crate::serial::_print(format_args!($($arg)*));
+pub fn init() {
+    kernel::idt::register_irq_handler(4, interrupt_handler);
+}
+
+fn interrupt_handler() {
+    let b = SERIAL.lock().port.receive();
+    let _c = match b as char {
+        '\r' => '\n',
+        '\x7F' => '\x08',
+        c => c,
     };
-}
-
-#[macro_export]
-macro_rules! serial_println {
-    () => ($crate::serial_print!("\n"));
-    ($fmt:expr) => ($crate::serial_print!(concat!($fmt, "\n")));
-    ($fmt:expr, $($arg:tt)*) => ($crate::serial_print!(
-        concat!($fmt, "\n"), $($arg)*));
 }

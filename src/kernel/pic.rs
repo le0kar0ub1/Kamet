@@ -12,7 +12,7 @@ pub static PICS: spin::Mutex<ChainedPics> =
     spin::Mutex::new(unsafe { ChainedPics::new(INTERRUPT_INDEX_PIC1, INTERRUPT_INDEX_PIC2) });
 
 pub fn irq_index(base: u8) -> u8 {
-    base + 32
+    base + INTERRUPT_INDEX_PIC1
 }
 
 #[allow(dead_code)]
@@ -35,7 +35,7 @@ pub fn clear_irq_mask(irq: u8) {
 
 pub extern "x86-interrupt" fn timer_handler(_stackframe: &mut InterruptStackFrame) {
     unsafe {
-        PICS.lock().notify_end_of_interrupt(32);
+        PICS.lock().notify_end_of_interrupt(INTERRUPT_INDEX_PIC1);
     }
 }
 

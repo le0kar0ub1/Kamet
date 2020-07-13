@@ -110,7 +110,3 @@ pub extern "x86-interrupt" fn security_exception_handler(stackframe: &mut Interr
     println!("Exception taken: security_exception\n{:?}", stackframe);
     loop { x86_64::instructions::hlt() };
 }
-
-
-
-

@@ -1,6 +1,6 @@
 # Kamet
 
-`Kamet` is x64 kernel wroten in rust with some VGA games integrated.
+`Kamet` is a x64 kernel wroten in rust with some (not yet) VGA games integrated.
 
 # Dependencies
 
@@ -16,8 +16,6 @@
 | `src/kernel`     | the kernel side setup                  |
 | `src/kamet`      | kernel games                           |
 
-# Game list
-
 # Build
 
 `cargo xbuild`
@@ -27,6 +25,23 @@
 cargo run the image with `qemu`.
 
 `cargo xrun`
+
+# ROADMAP
+
+Achieved using a lot of crate packages.
+
+- [X] Bootloading
+- [X] Boot
+  - [X] GDT
+  - [X] IDT
+  - [X] Interrupt handling
+  - [X] PIC
+- [ ] Drivers
+  - [X] keyboard
+  - [ ] PIT
+  - [X] serial
+  - [X] VGA
+
 
 # Epilogue
 

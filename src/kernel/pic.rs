@@ -1,7 +1,6 @@
 use crate::*;
 use pic8259_simple::ChainedPics;
 use spin;
-use x86_64::structures::idt::InterruptStackFrame;
 use x86_64::instructions::port::Port;
 
 const INTERRUPT_INDEX_PIC1: u8 = 32;

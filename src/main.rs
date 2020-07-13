@@ -19,9 +19,10 @@ pub fn init() {
     kernel::idt::init();
     drivers::keyboard::init();
     drivers::serial::init();
+    drivers::pit::init();
     unsafe { 
-        kernel::pic::PICS.lock().initialize()
-    };
+        kernel::pic::PICS.lock().initialize();
+    }
     x86_64::instructions::interrupts::enable();
     kamet::strt::menu();
 }

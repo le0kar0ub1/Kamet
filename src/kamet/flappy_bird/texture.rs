@@ -1,0 +1,52 @@
+static BlockUpper: &[&str] = &["
+ MMMMMM
+ MMMMMM
+ MMMMMM
+ MMMMMM
+--------
+",
+"
+ MMMMMM
+ MMMMMM
+ MMMMMM
+ MMMMMM
+ MMMMMM
+ MMMMMM
+--------
+",
+"
+ MMMMMM
+ MMMMMM
+ MMMMMM
+ MMMMMM
+ MMMMMM
+ MMMMMM
+ MMMMMM
+--------"],
+
+static BlockLower: &[&str] = &["
+________
+ wwwwww
+ wwwwww
+ wwwwww
+ wwwwww
+",
+"
+________
+ wwwwww
+ wwwwww
+ wwwwww
+ wwwwww
+ wwwwww
+ wwwwww
+ ",
+"
+________
+ wwwwww
+ wwwwww
+ wwwwww
+ wwwwww
+ wwwwww
+ wwwwww
+ wwwwww
+"],
